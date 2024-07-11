@@ -119,7 +119,6 @@ func init() {
 
 				isSender := client == msg.Sender
 				if !isSender {
-					fmt.Println(msg.Room)
 					if online, ok := onlines[userId]; ok {
 						fmt.Println("user is online and ready to receive message")
 						// Push new message to chat list of online user
