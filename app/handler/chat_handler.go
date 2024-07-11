@@ -115,22 +115,33 @@ func init() {
 
 			// msg.Clients is list of clients in room
 			// so we need to send message to all clients except sender
-			for userId, client := range msg.Clients {
+			for _, client := range msg.Clients {
 
 				isSender := client == msg.Sender
 				if !isSender {
-					if online, ok := onlines[userId]; ok {
-						fmt.Println("user is online and ready to receive message")
-						// Push new message to chat list of online user
-						pushData := map[string]string{
-							"message": msg.Message,
-							"room":    msg.Room,
-						}
-						online.Conn.WriteJSON(pushData)
-					}
+					// This will happend if antoher user is online
+					// Otherwhise this block code will proccessing
+					// Because we have not live users to chat
 					client.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Message))
 				}
 			}
+
+			// Do get all clients on room participants from redis cache
+			// And then do matching that user ids to onlines users variable
+			// If user online found just push that new message to the room or chat list
+			// As higlight message or with counter message
+			// @Todo
+
+			// Check for user is online
+			// if online, ok := onlines[userId]; ok {
+			// 	fmt.Println("user is online and ready to receive message")
+			// 	// Push new message to chat list of online user
+			// 	pushData := map[string]string{
+			// 		"message": msg.Message,
+			// 		"room":    msg.Room,
+			// 	}
+			// 	online.Conn.WriteJSON(pushData)
+			// }
 
 			chatMu.Unlock()
 		}
