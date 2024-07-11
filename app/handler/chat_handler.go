@@ -26,6 +26,7 @@ var rooms = make(map[string]map[string]*types.Client)
 var listMu, chatMu sync.Mutex
 var boradcast = make(chan types.Broadcast)
 
+// WsChatList is websocket handler to get realtime chat list
 func (ch *chatHandler) WsChatList() fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		userId := c.Query("userid")
@@ -63,6 +64,7 @@ func (ch *chatHandler) WsChatList() fiber.Handler {
 	})
 }
 
+// WsChat is websocket handler for live chatting
 func (ch *chatHandler) WsChat() fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		room := c.Params("room")
@@ -105,6 +107,7 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 	})
 }
 
+// This is method for listening broadcast message
 func init() {
 	// Broadcast messages to all clients in rooms
 	go func() {
