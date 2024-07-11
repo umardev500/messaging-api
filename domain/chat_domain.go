@@ -17,3 +17,7 @@ type ChatService interface {
 	SaveMessage(ctx context.Context, data types.InputNewMessage)
 	PushNewChat(ctx context.Context, payload types.PushNewChatPayload)
 }
+
+type ChatRepository interface {
+	CreateChat(ctx context.Context, payload types.PushNewChatPayload) error
+}
