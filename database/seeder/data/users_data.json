@@ -1,0 +1,30 @@
+[
+    {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "username": "user1",
+        "password_hash": "$2a$10$6U8RmZb6B2x3R5hIbAOMN.13Mv/4eOly3zQvRZL7ltYAsSgCVlNqG",
+        "created_at": "2024-06-15T10:00:00Z",
+        "updated_at": "2024-06-15T10:05:00Z"
+    },
+    {
+        "id": "78901234-5678-9012-3456-789012345678",
+        "username": "user2",
+        "password_hash": "$2a$10$w0gYDTN4QPCetW5FAnHgZ.yoWp6EeETZ1t7r9Id5Z0U8ZQjVYZo9K",
+        "created_at": "2024-06-16T11:00:00Z",
+        "updated_at": "2024-06-16T11:05:00Z"
+    },
+    {
+        "id": "123e4567-e89b-12d3-a456-426614174001",
+        "username": "user3",
+        "password_hash": "$2a$10$6U8RmZb6B2x3R5hIbAOMN.13Mv/4eOly3zQvRZL7ltYAsSgCVlNqG",
+        "created_at": "2024-06-15T10:00:00Z",
+        "updated_at": "2024-06-15T10:05:00Z"
+    },
+    {
+        "id": "123e4567-e89b-12d3-a456-426614174002",
+        "username": "user4",
+        "password_hash": "$2a$10$6U8RmZb6B2x3R5hIbAOMN.13Mv/4eOly3zQvRZL7ltYAsSgCVlNqG",
+        "created_at": "2024-06-15T10:00:00Z",
+        "updated_at": "2024-06-15T10:05:00Z"
+    }
+]

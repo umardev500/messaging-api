@@ -2,6 +2,7 @@ package types
 
 import (
 	"sync"
+	"time"
 
 	"github.com/gofiber/contrib/websocket"
 )
@@ -31,4 +32,12 @@ type PushNewChatPayload struct {
 	ChatName     *string         `json:"chat_name"`    // if filled that indicate the chat group otherwise that one to one chat
 	Participants []string        `json:"participants"` // is slice of user id
 	Message      InputNewMessage `json:"message"`
+}
+
+// Chat is chat struct
+type Chat struct {
+	Id        string     `json:"id"`
+	ChatName  *string    `json:"chat_name"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
