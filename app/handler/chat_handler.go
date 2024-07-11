@@ -152,7 +152,36 @@ func init() {
 }
 
 func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
-	onlines["1"].Conn.WriteMessage(websocket.TextMessage, []byte("hi from push"))
+	var payload types.PushNewChatPayload
+	if err := c.BodyParser(&payload); err != nil {
+		fmt.Println(err)
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
 
-	return c.JSON(len(onlines))
+	var totalOnline = len(onlines)
+
+	data := map[string]interface{}{
+		"online":  totalOnline,
+		"payload": payload,
+	}
+
+	// Push new chat list to the user online matched
+	for _, participant := range payload.Participants {
+		if online, ok := onlines[participant]; ok {
+			log.Debug().Msg("Participant is online ready to push new chat list")
+
+			pushData := map[string]string{
+				"message": *payload.Message.Text,
+				"room":    "1000",
+			}
+			err := online.Conn.WriteJSON(pushData)
+			if err != nil {
+				return c.JSON("failed to push new chat list to the users")
+			}
+		}
+	}
+
+	// @Todo database storing
+
+	return c.JSON(data)
 }
