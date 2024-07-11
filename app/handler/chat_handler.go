@@ -132,7 +132,8 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 	fmt.Println(msgData)
 
 	// Broadcasting... we can deal what we want?
-	// Does we need input
+	// Does we need input to the database first or send websocket data first
+	// If want to make input to the database first just make line of code is sync and make pushing websocket logic is after input data
 	for _, client := range msg.Clients {
 		// Broadcast message with goroutine
 		go func() {
