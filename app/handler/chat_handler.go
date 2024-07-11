@@ -165,6 +165,7 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 }
 
 func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
+	// Parsing
 	var payload types.PushNewChatPayload
 	if err := c.BodyParser(&payload); err != nil {
 		fmt.Println(err)
@@ -173,15 +174,12 @@ func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// Proccessing intialization of new chat
 	var userId = "78901234-5678-9012-3456-789012345678"
 	payload.UserId = userId
-	ch.chatService.PushNewChat(ctx, payload)
-
-	var totalOnline = len(onlines)
-
-	data := map[string]interface{}{
-		"online":  totalOnline,
-		"payload": payload,
+	resp, err := ch.chatService.PushNewChat(ctx, payload)
+	if err != nil {
+		return c.Status(resp.Code).JSON(resp)
 	}
 
 	// Push new chat list to the user online matched
@@ -200,7 +198,5 @@ func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
 		}
 	}
 
-	// @Todo database storing
-
-	return c.JSON(data)
+	return c.Status(resp.Code).JSON(resp)
 }
