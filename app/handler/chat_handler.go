@@ -6,15 +6,20 @@ import (
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
 	"github.com/umardev500/messaging-api/types"
 )
 
-type chatHandler struct{}
+type chatHandler struct {
+	chatService domain.ChatService
+}
 
-func NewChatHandler() domain.ChatHandler {
-	return &chatHandler{}
+func NewChatHandler(chatService domain.ChatService) domain.ChatHandler {
+	return &chatHandler{
+		chatService: chatService,
+	}
 }
 
 type Online struct {
@@ -24,7 +29,6 @@ type Online struct {
 var onlines = make(map[string]*Online)
 var rooms = make(map[string]map[string]*types.Client)
 var listMu, chatMu sync.Mutex
-var boradcast = make(chan types.Broadcast)
 
 // WsChatList is websocket handler to get realtime chat list
 func (ch *chatHandler) WsChatList() fiber.Handler {
@@ -97,59 +101,60 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 				return
 			}
 
-			boradcast <- types.Broadcast{
-				Sender:  client,
+			broadcastData := types.Broadcast{
+				Sender:  userId,
 				Room:    room,
 				Clients: rooms[room],
 				Message: string(msg),
 			}
+			go ch.broadcastMessage(broadcastData)
 		}
 	})
 }
 
-// This is method for listening broadcast message
-func init() {
-	// Broadcast messages to all clients in rooms
-	go func() {
-		for {
-			msg := <-boradcast
-			chatMu.Lock()
-			log.Info().Msgf("broadcasting message: %s", msg.Message)
+func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
+	chatMu.Lock()
+	defer chatMu.Unlock()
 
-			// msg.Clients is list of clients in room
-			// so we need to send message to all clients except sender
-			for _, client := range msg.Clients {
-				client.Mu.Lock()
-				isSender := client == msg.Sender
-				if !isSender {
-					// This will happend if antoher user is online
-					// Otherwhise this block code will proccessing
-					// Because we have not live users to chat
-					client.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Message))
-				}
-				client.Mu.Unlock()
+	log.Info().Msgf("broadcasting message: %s", msg.Message)
+	sender := msg.Clients[msg.Sender]
+
+	// @Todo store message to the database
+	//
+	//
+	msgId := uuid.New().String()
+	var msgData = types.InputNewMessage{
+		Id:     msgId,
+		Room:   &msg.Room,
+		UserId: msg.Sender,
+		Text:   &msg.Message,
+	}
+	fmt.Println(msgData)
+
+	// Broadcasting
+	for _, client := range msg.Clients {
+		go func() {
+			client.Mu.Lock()
+			isSender := client == sender
+			if !isSender {
+				// This will happend if antoher user is online
+				// Otherwhise this block code will proccessing
+				// Because we have not live users to chat
+				client.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Message))
+				// @Todo handle error
+				//
 			}
+			client.Mu.Unlock()
+		}()
+	}
 
-			// Do get all clients on room participants from redis cache
-			// And then do matching that user ids to onlines users variable
-			// If user online found just push that new message to the room or chat list
-			// As higlight message or with counter message
-			// @Todo
+	// @Todo push incoming chat to the chat list
+	// We get participant data from redis cache
+	// And then we push new chat to the chat list
+	// First we matching does list of participants is exist in the onlines variable
+	// If yes then we push it otherwise skip it
+	// And skip to push to sender chat list
 
-			// Check for user is online
-			// if online, ok := onlines[userId]; ok {
-			// 	fmt.Println("user is online and ready to receive message")
-			// 	// Push new message to chat list of online user
-			// 	pushData := map[string]string{
-			// 		"message": msg.Message,
-			// 		"room":    msg.Room,
-			// 	}
-			// 	online.Conn.WriteJSON(pushData)
-			// }
-
-			chatMu.Unlock()
-		}
-	}()
 }
 
 func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {

@@ -12,7 +12,7 @@ type Client struct {
 }
 
 type Broadcast struct {
-	Sender  *Client
+	Sender  string
 	Room    string
 	Clients map[string]*Client
 	Message string
