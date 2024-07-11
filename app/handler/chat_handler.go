@@ -119,7 +119,7 @@ func init() {
 			// msg.Clients is list of clients in room
 			// so we need to send message to all clients except sender
 			for _, client := range msg.Clients {
-
+				client.Mu.Lock()
 				isSender := client == msg.Sender
 				if !isSender {
 					// This will happend if antoher user is online
@@ -127,6 +127,7 @@ func init() {
 					// Because we have not live users to chat
 					client.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Message))
 				}
+				client.Mu.Unlock()
 			}
 
 			// Do get all clients on room participants from redis cache
