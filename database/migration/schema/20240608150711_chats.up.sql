@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS chats (
     id UUID DEFAULT gen_random_uuid(),
     chat_name VARCHAR (255) DEFAULT NULL, -- Only used for group chats, can be null for individual chats
-    is_group BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT NULL,
 
