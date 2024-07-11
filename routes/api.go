@@ -15,8 +15,9 @@ func (r *Routes) Api() {
 	// Connection
 	conn := config.NewPgx()
 
+	participantRepository := repository.NewParticipantRepository(conn)
 	chatRepository := repository.NewChatRepository(conn)
-	chatService := service.NewChatService(chatRepository, conn)
+	chatService := service.NewChatService(chatRepository, participantRepository, conn)
 	chat := handler.NewChatHandler(chatService)
 	chatRoute := app.Group("chat")
 	chatRoute.Get("/list", chat.WsChatList())

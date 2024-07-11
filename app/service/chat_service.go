@@ -14,14 +14,16 @@ import (
 )
 
 type chatService struct {
-	chatRepository domain.ChatRepository
-	conn           *config.PgxConfig
+	chatRepository        domain.ChatRepository
+	participantRepository domain.ParticipantRepository
+	conn                  *config.PgxConfig
 }
 
-func NewChatService(chatRepository domain.ChatRepository, conn *config.PgxConfig) domain.ChatService {
+func NewChatService(chatRepository domain.ChatRepository, participantRepository domain.ParticipantRepository, conn *config.PgxConfig) domain.ChatService {
 	return &chatService{
-		chatRepository: chatRepository,
-		conn:           conn,
+		chatRepository:        chatRepository,
+		participantRepository: participantRepository,
+		conn:                  conn,
 	}
 }
 
@@ -47,8 +49,10 @@ func (c *chatService) PushNewChat(ctx context.Context, payload types.PushNewChat
 		}
 
 		// Initialize chat participants
-
-		fmt.Println("ok")
+		err = c.participantRepository.AddParticipant(ctx, types.InputParticipant{
+			ChatId:       roomId,
+			Participants: payload.Participants,
+		})
 
 		return
 	})

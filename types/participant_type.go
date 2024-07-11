@@ -8,3 +8,8 @@ type Participant struct {
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
+
+type InputParticipant struct {
+	ChatId       string
+	Participants []string
+}
