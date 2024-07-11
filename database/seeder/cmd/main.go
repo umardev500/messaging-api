@@ -8,8 +8,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/umardev500/realtime-chat/config"
-	"github.com/umardev500/realtime-chat/database/seeder"
+	"github.com/umardev500/messaging-api/config"
+	"github.com/umardev500/messaging-api/database/seeder"
 )
 
 func init() {
