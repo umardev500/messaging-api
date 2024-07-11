@@ -173,7 +173,7 @@ func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	var userId = "1"
+	var userId = "78901234-5678-9012-3456-789012345678"
 	payload.UserId = userId
 	ch.chatService.PushNewChat(ctx, payload)
 

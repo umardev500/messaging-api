@@ -18,11 +18,13 @@ func NewChatRepository(conn *config.PgxConfig) domain.ChatRepository {
 	}
 }
 
-func (cr *chatRepository) CreateChat(ctx context.Context, payload types.PushNewChatPayload) error {
-	// q := cr.conn.TrOrDB(ctx)
-	// sql := `--sql
-	// 	INSERT INTO chat_participants(room_id, user_id) VALUES ($1, $2)
-	// `
+func (cr *chatRepository) CreateChat(ctx context.Context, payload types.PushNewChatPayload) (err error) {
+	q := cr.conn.TrOrDB(ctx)
+	sql := `--sql
+		INSERT INTO chats (id, chat_name) VALUES ($1, $2)
+	`
 
-	return nil
+	_, err = q.Exec(ctx, sql, payload.Room, payload.ChatName)
+
+	return
 }
