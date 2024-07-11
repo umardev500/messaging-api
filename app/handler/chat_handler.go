@@ -1,14 +1,17 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
+	"github.com/umardev500/messaging-api/storage"
 	"github.com/umardev500/messaging-api/types"
 )
 
@@ -123,13 +126,12 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 	//
 	//
 	msgId := uuid.New().String()
-	var msgData = types.InputNewMessage{
+	_ = types.InputNewMessage{
 		Id:     msgId,
 		Room:   &msg.Room,
 		UserId: msg.Sender,
 		Text:   &msg.Message,
 	}
-	fmt.Println(msgData)
 
 	// Broadcasting... we can deal what we want?
 	// Does we need input to the database first or send websocket data first
@@ -157,7 +159,9 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 	// First we matching does list of participants is exist in the onlines variable
 	// If yes then we push it otherwise skip it
 	// And skip to push to sender chat list
-
+	b, err := storage.Redis.Get(msg.Room)
+	fmt.Println(b)
+	fmt.Println(err)
 }
 
 func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
@@ -166,6 +170,12 @@ func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
 		fmt.Println(err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var userId = "1"
+	payload.UserId = userId
+	ch.chatService.PushNewChat(ctx, payload)
 
 	var totalOnline = len(onlines)
 

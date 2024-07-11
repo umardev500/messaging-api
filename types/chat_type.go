@@ -26,6 +26,7 @@ type InputNewMessage struct {
 }
 
 type PushNewChatPayload struct {
+	UserId       string          `json:"-"`
 	Room         string          `json:"-"`            // Auto
 	ChatName     *string         `json:"chat_name"`    // if filled that indicate the chat group otherwise that one to one chat
 	Participants []string        `json:"participants"` // is slice of user id

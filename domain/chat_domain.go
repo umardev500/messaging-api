@@ -15,4 +15,5 @@ type ChatHandler interface {
 
 type ChatService interface {
 	SaveMessage(ctx context.Context, data types.InputNewMessage)
+	PushNewChat(ctx context.Context, payload types.PushNewChatPayload)
 }
