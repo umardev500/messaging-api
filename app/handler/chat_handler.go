@@ -131,8 +131,10 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 	}
 	fmt.Println(msgData)
 
-	// Broadcasting
+	// Broadcasting... we can deal what we want?
+	// Does we need input
 	for _, client := range msg.Clients {
+		// Broadcast message with goroutine
 		go func() {
 			client.Mu.Lock()
 			isSender := client == sender
