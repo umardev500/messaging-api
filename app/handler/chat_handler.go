@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
@@ -56,7 +57,6 @@ func (ch *chatHandler) WsChatList() fiber.Handler {
 			listMu.Unlock()
 			c.Close()
 		}()
-		fmt.Println(onlines)
 
 		// Listen for incoming message
 		for {
@@ -153,15 +153,47 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 		}()
 	}
 
-	// @Todo push incoming chat to the chat list
+	// Push incoming chat to the chat list
 	// We get participant data from redis cache
 	// And then we push new chat to the chat list
 	// First we matching does list of participants is exist in the onlines variable
 	// If yes then we push it otherwise skip it
 	// And skip to push to sender chat list
 	b, err := storage.Redis.Get(msg.Room)
-	fmt.Println(b)
-	fmt.Println(err)
+	if err != nil {
+		log.Error().Msgf("failed to get room data from redis cache")
+		return
+	}
+	var userIds []string
+	if err := json.Unmarshal(b, &userIds); err != nil {
+		log.Error().Msgf("failed marshaling room data")
+		return
+	}
+
+	// Broadcast and push a chat list data to online user
+	for _, userId := range userIds {
+		var localMu sync.Mutex
+		go func(userId string) {
+			localMu.Lock()
+			online, ok := onlines[userId]
+			if !ok {
+				return
+			}
+			conn := online.Conn
+
+			var data = types.BroadcastChatList{
+				Room:    msg.Room,
+				Message: msg.Message,
+			}
+			err := conn.WriteJSON(data)
+			if err != nil {
+				log.Error().Msgf("failed to write message %v", err)
+			}
+
+			localMu.Unlock()
+		}(userId)
+
+	}
 }
 
 func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {

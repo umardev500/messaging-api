@@ -19,6 +19,11 @@ type Broadcast struct {
 	Message string
 }
 
+type BroadcastChatList struct {
+	Room    string `json:"room"`
+	Message string `json:"message"`
+}
+
 type InputNewMessage struct {
 	Id     string  `json:"-"`    // Auto
 	Room   *string `json:"room"` // Optional and if not filled that indicate create a new room chat and will filled automatically after initialize chat
