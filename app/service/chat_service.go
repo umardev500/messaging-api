@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -30,6 +31,7 @@ func NewChatService(chatRepository domain.ChatRepository, participantRepository 
 func (c *chatService) SaveMessage(ctx context.Context, data types.InputNewMessage) {}
 
 func (c *chatService) PushNewChat(ctx context.Context, payload types.PushNewChatPayload) (resp types.Response, err error) {
+	timestamp := time.Now().UTC().Unix()
 	ticket := uuid.New().String()
 	resp.Ticket = ticket
 
@@ -75,6 +77,11 @@ func (c *chatService) PushNewChat(ctx context.Context, payload types.PushNewChat
 
 	resp.Code = fiber.StatusCreated
 	resp.Message = "Success create new chat"
+	resp.Data = types.BroadcastChatList{
+		Room:      roomId,
+		Message:   *payload.Message.Text,
+		Timestamp: timestamp,
+	}
 
 	return
 }

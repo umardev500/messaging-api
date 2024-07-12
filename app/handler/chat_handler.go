@@ -220,23 +220,19 @@ func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
 	// Push new chat list to the user online matched
 	for _, participant := range payload.Participants {
 		var localMu sync.Mutex
-		go func(participant string) {
+		go func(participant string, resp types.Response) {
 			localMu.Lock()
 			if online, ok := onlines[participant]; ok {
 				log.Debug().Msg("Participant is online ready to push new chat list")
 
-				pushData := map[string]string{
-					"message": *payload.Message.Text,
-					"room":    "1000",
-				}
-				err := online.Conn.WriteJSON(pushData)
+				err := online.Conn.WriteJSON(resp.Data)
 				if err != nil {
 					log.Error().Msgf("Failed to push to user chat list id: %s", participant)
 					return
 				}
 			}
 			localMu.Unlock()
-		}(participant)
+		}(participant, resp)
 	}
 
 	return c.Status(resp.Code).JSON(resp)
