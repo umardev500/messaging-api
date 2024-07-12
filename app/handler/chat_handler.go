@@ -62,7 +62,7 @@ func (ch *chatHandler) WsChatList() fiber.Handler {
 		for {
 			_, msg, err := c.ReadMessage()
 			if err != nil {
-				fmt.Println(err)
+				log.Error().Msgf("failed to read message %v", err)
 				return
 			}
 
