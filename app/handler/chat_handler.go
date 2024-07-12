@@ -101,6 +101,9 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 			_, msg, err := c.Conn.ReadMessage()
 			if err != nil {
 				log.Error().Err(err).Msg("error reading message")
+				chatMu.Lock()
+				delete(rooms[room], userId)
+				chatMu.Unlock()
 				return
 			}
 
