@@ -20,8 +20,9 @@ type Broadcast struct {
 }
 
 type BroadcastChatList struct {
-	Room    string `json:"room"`
-	Message string `json:"message"`
+	Room      string `json:"room"`
+	Message   string `json:"message"`
+	Timestamp int64  `json:"timestamp"`
 }
 
 type InputNewMessage struct {

@@ -118,6 +118,7 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 	chatMu.Lock()
 	defer chatMu.Unlock()
+	var timestamp = time.Now().UTC().Unix()
 
 	log.Info().Msgf("broadcasting message: %s", msg.Message)
 	sender := msg.Clients[msg.Sender]
@@ -182,8 +183,9 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 			conn := online.Conn
 
 			var data = types.BroadcastChatList{
-				Room:    msg.Room,
-				Message: msg.Message,
+				Room:      msg.Room,
+				Message:   msg.Message,
+				Timestamp: timestamp,
 			}
 			err := conn.WriteJSON(data)
 			if err != nil {
