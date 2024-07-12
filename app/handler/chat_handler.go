@@ -58,6 +58,10 @@ func (ch *chatHandler) WsChatList() fiber.Handler {
 			c.Close()
 		}()
 
+		// @Todo
+		// We do fetch chat list of connected user
+		//
+
 		// Listen for incoming message
 		for {
 			_, msg, err := c.ReadMessage()
