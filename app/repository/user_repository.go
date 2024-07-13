@@ -21,11 +21,11 @@ func NewuserRepository(conn *config.PgxConfig) domain.UserRepository {
 func (u *userRepository) FindByUsername(ctx context.Context, username string) (user *types.User, err error) {
 	q := u.conn.TrOrDB(ctx)
 	sql := `--sql
-		SELECT u.id, u.username FROM users u WHERE username=$1;
+		SELECT u.id, u.username, u.password_hash FROM users u WHERE username=$1;
 	`
 	var data types.User
 
-	if err := q.QueryRow(ctx, sql, username).Scan(&data.ID, &data.Username); err != nil {
+	if err := q.QueryRow(ctx, sql, username).Scan(&data.ID, &data.Username, &data.PasswordHash); err != nil {
 		return nil, err
 	}
 	user = &data

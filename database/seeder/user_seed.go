@@ -8,8 +8,15 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/rs/zerolog/log"
-	"github.com/umardev500/messaging-api/types"
 )
+
+type User struct {
+	ID           string     `json:"id"`
+	Username     string     `json:"username"`
+	PasswordHash string     `json:"password_hash"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    *time.Time `json:"updated_at,omitempty"`
+}
 
 func (s *Seeder) UserSeed(ctx context.Context) (err error) {
 	q := s.Conn.TrOrDB(ctx)
@@ -21,7 +28,7 @@ func (s *Seeder) UserSeed(ctx context.Context) (err error) {
 		return err
 	}
 
-	var rows []types.User
+	var rows []User
 	if err := json.Unmarshal(f, &rows); err != nil {
 		return err
 	}
@@ -65,7 +72,7 @@ func (s *Seeder) UserDown(ctx context.Context) (err error) {
 		return err
 	}
 
-	var rows []types.User
+	var rows []User
 	if err := json.Unmarshal(f, &rows); err != nil {
 		return err
 	}
