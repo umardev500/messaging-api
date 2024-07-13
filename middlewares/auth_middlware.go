@@ -36,7 +36,7 @@ func CheckAuth(c *fiber.Ctx) error {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok && !token.Valid {
-		log.Error().Msgf("token is not map claims of jwt mapclaims: %v | ticket: %s", err, ticket)
+		log.Error().Msgf("error casting mapclaims: %v | ticket: %s", err, ticket)
 		return fiber.ErrUnauthorized
 	}
 
