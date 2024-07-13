@@ -10,6 +10,6 @@ type AuthData struct {
 }
 
 type UserClaim struct {
-	Id       string `json:"id"`
-	Username string `json:"username"`
+	Id       interface{} `json:"id"`
+	Username string      `json:"username"`
 }

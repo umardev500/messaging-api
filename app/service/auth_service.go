@@ -7,15 +7,20 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackc/pgx/v5"
+	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
 	"github.com/umardev500/messaging-api/types"
 )
 
 type authService struct {
+	userRepository domain.UserRepository
 }
 
-func NewAuthService() domain.AuthService {
-	return &authService{}
+func NewAuthService(userRepository domain.UserRepository) domain.AuthService {
+	return &authService{
+		userRepository: userRepository,
+	}
 }
 
 func (s *authService) Login(ctx context.Context, payload types.LoginPayload) types.Response {
@@ -24,23 +29,35 @@ func (s *authService) Login(ctx context.Context, payload types.LoginPayload) typ
 		Ticket: ticket,
 	}
 
-	// @Todo
 	// Fetch user data from database
-	//
+	user, err := s.userRepository.FindByUsername(ctx, payload.Username)
+	if err != nil {
+		log.Error().Msgf("error finding by username: %v | ticket: %s", err, ticket)
+		if err == pgx.ErrNoRows {
+			resp.Code = fiber.StatusNotFound
+			resp.Message = fiber.ErrNotFound.Message
+			return resp
+		}
+
+		resp.Code = fiber.StatusInternalServerError
+		resp.Message = fiber.ErrInternalServerError.Message
+		return resp
+	}
 
 	var key = []byte(os.Getenv("SECRET_KEY"))
-	var user = types.UserClaim{
-		Id:       "78901234-5678-9012-3456-789012345678",
-		Username: "user2",
+	var userClaim = types.UserClaim{
+		Id:       user.ID,
+		Username: user.Username,
 	}
 	claims := jwt.MapClaims{
-		"user": user,
+		"user": userClaim,
 		"exp":  time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString(key)
 
 	if err != nil {
+		log.Error().Msgf("error signing token: %v | ticket: %s", err, ticket)
 		resp.Code = fiber.StatusInternalServerError
 		resp.Message = "Error signing token"
 		return resp

@@ -27,7 +27,8 @@ func (r *Routes) Api() {
 
 	// Auth
 	authRoute := app.Group("auth")
-	authService := service.NewAuthService()
+	userRepository := repository.NewuserRepository(conn)
+	authService := service.NewAuthService(userRepository)
 	auth := handler.NewAuthHandler(authService)
 	authRoute.Post("/login", auth.Login)
 }
