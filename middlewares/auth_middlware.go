@@ -45,7 +45,6 @@ func CheckAuth(c *fiber.Ctx) error {
 }
 
 func GetMapClaims(tokenString string) (jwt.MapClaims, error) {
-	tokenString = tokenString[7:] // remove the bearer prefix
 	var signingKey = []byte(os.Getenv("SECRET_KEY"))
 
 	t, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
