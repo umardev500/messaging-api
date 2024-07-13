@@ -6,6 +6,7 @@ import (
 	"github.com/umardev500/messaging-api/app/repository"
 	"github.com/umardev500/messaging-api/app/service"
 	"github.com/umardev500/messaging-api/config"
+	"github.com/umardev500/messaging-api/middlewares"
 )
 
 func (r *Routes) Api() {
@@ -22,5 +23,11 @@ func (r *Routes) Api() {
 	chatRoute := app.Group("chat")
 	chatRoute.Get("/list", chat.WsChatList())
 	chatRoute.Get("/:room", chat.WsChat())
-	chatRoute.Post("/new", chat.PushNewChat)
+	chatRoute.Post("/new", middlewares.CheckAuth, chat.PushNewChat)
+
+	// Auth
+	authRoute := app.Group("auth")
+	authService := service.NewAuthService()
+	auth := handler.NewAuthHandler(authService)
+	authRoute.Post("/login", auth.Login)
 }
