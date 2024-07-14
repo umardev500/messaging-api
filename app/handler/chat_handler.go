@@ -90,8 +90,18 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		room := c.Params("room")
 		userId := c.Query("userid")
+		tokenString := c.Query("token")
 		client := &types.Client{
 			Conn: c,
+		}
+
+		resp, err := ch.chatService.GetClaims(tokenString)
+		if err != nil {
+			if err := c.Conn.WriteJSON(resp); err != nil {
+				log.Error().Msgf("failed to write ws message | err: %v | ticket: %s", err, resp.Ticket)
+			}
+
+			return
 		}
 
 		// Appends user to rooms
