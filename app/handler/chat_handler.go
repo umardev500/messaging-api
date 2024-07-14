@@ -9,6 +9,7 @@ import (
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
@@ -37,7 +38,6 @@ var listMu, chatMu sync.Mutex
 // WsChatList is websocket handler to get realtime chat list
 func (ch *chatHandler) WsChatList() fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
-		userId := c.Query("userid")
 		tokenString := c.Query("token")
 		online := &Online{
 			Conn: c,
@@ -51,6 +51,8 @@ func (ch *chatHandler) WsChatList() fiber.Handler {
 
 			return
 		}
+		userData := resp.Data.(jwt.MapClaims)["user"].(map[string]interface{})
+		userId := userData["id"].(string)
 
 		// Add user to online group
 		listMu.Lock()
@@ -89,7 +91,6 @@ func (ch *chatHandler) WsChatList() fiber.Handler {
 func (ch *chatHandler) WsChat() fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		room := c.Params("room")
-		userId := c.Query("userid")
 		tokenString := c.Query("token")
 		client := &types.Client{
 			Conn: c,
@@ -103,6 +104,8 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 
 			return
 		}
+		userData := resp.Data.(jwt.MapClaims)["user"].(map[string]interface{})
+		userId := userData["id"].(string)
 
 		// Appends user to rooms
 		chatMu.Lock()
