@@ -1,8 +1,13 @@
 package types
 
+type ErrDetail struct {
+	Field  string      `json:"field"`
+	Filter string      `json:"filter"`
+	Detail interface{} `json:"detail"`
+}
 type Error struct {
-	Code    int         `json:"code"`
-	Details interface{} `json:"details"`
+	Code    CodeName  `json:"code"`
+	Details ErrDetail `json:"details"`
 }
 
 type Response struct {

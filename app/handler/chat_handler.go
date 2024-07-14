@@ -38,8 +38,18 @@ var listMu, chatMu sync.Mutex
 func (ch *chatHandler) WsChatList() fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		userId := c.Query("userid")
+		tokenString := c.Query("token")
 		online := &Online{
 			Conn: c,
+		}
+
+		resp, err := ch.chatService.GetClaims(tokenString)
+		if err != nil {
+			if err := c.Conn.WriteJSON(resp); err != nil {
+				log.Error().Msgf("failed to write ws message | err: %v | ticket: %s", err, resp.Ticket)
+			}
+
+			return
 		}
 
 		// Add user to online group

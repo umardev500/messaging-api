@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,6 +13,7 @@ import (
 	"github.com/umardev500/messaging-api/domain"
 	"github.com/umardev500/messaging-api/storage"
 	"github.com/umardev500/messaging-api/types"
+	"github.com/umardev500/messaging-api/utils"
 )
 
 type chatService struct {
@@ -26,6 +28,49 @@ func NewChatService(chatRepository domain.ChatRepository, participantRepository 
 		participantRepository: participantRepository,
 		conn:                  conn,
 	}
+}
+
+func (c *chatService) GetClaims(tokenString string) (types.Response, error) {
+	var ticket = uuid.New().String()
+
+	var resp = types.Response{
+		Ticket: ticket,
+	}
+
+	// Validating
+	if tokenString == "" {
+		log.Error().Msgf("token string is empy | ticket: %s", ticket)
+		resp.Message = fiber.ErrBadRequest.Message
+		resp.Error = &types.Error{
+			Code: types.ValidationErr,
+			Details: types.ErrDetail{
+				Field:  "token",
+				Filter: "required",
+				Detail: "token parameter is required",
+			},
+		}
+
+		return resp, fmt.Errorf("token string is empty")
+	}
+	claims, err := utils.GetMapClaims(tokenString)
+	if err != nil {
+		log.Error().Msgf("failed to get map claims err: %v | ticket: %s", err, ticket)
+		resp.Message = fiber.ErrBadRequest.Message
+		resp.Error = &types.Error{
+			Code: types.ValidationErr,
+			Details: types.ErrDetail{
+				Field:  "token",
+				Filter: "failed",
+				Detail: "token is failed on check",
+			},
+		}
+
+		return resp, fmt.Errorf("token is failed on check")
+	}
+
+	resp.Data = claims
+
+	return resp, nil
 }
 
 func (c *chatService) SaveMessage(ctx context.Context, data types.InputNewMessage) {}
