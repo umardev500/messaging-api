@@ -10,3 +10,10 @@ type Message struct {
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
+
+type CreateMessage struct {
+	Id      string `json:"-"` // get from auto generated
+	ChatId  string `json:"-"` // get from param
+	UserId  string `json:"-"` // get from token
+	Content string `json:"content"`
+}
