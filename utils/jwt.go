@@ -7,6 +7,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+func ParseToken(rawTokenString string) string {
+	return rawTokenString[7:]
+}
+
+func GetMapClaimsRaw(rawTokenString string) (jwt.MapClaims, error) {
+	rawTokenString = ParseToken(rawTokenString)
+
+	return GetMapClaims(rawTokenString)
+}
+
 func GetMapClaims(tokenString string) (jwt.MapClaims, error) {
 	var signingKey = []byte(os.Getenv("SECRET_KEY"))
 

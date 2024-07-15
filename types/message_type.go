@@ -11,6 +11,10 @@ type Message struct {
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
+type MessagePayload struct {
+	Content string `json:"content"`
+}
+
 type CreateMessage struct {
 	Id      string `json:"-"` // get from auto generated
 	ChatId  string `json:"-"` // get from param

@@ -4,23 +4,23 @@
         "chat_id": "1d1ab1b3-668c-4f51-b578-109cdbc0fcc3",
         "user_id": "123e4567-e89b-12d3-a456-426614174000",
         "content": "Hello chat for group chat",
-        "created_at": "2024-06-15T12:34:56Z",
-        "updated_at": "2024-06-15T14:00:00Z"
+        "created_at": "2024-05-15T12:34:56Z",
+        "updated_at": "2024-05-15T14:00:00Z"
     },
     {
         "id": "1d1ab1b3-668c-4f51-b578-109cdbc0fcc2",
         "chat_id": "1d1ab1b3-668c-4f51-b578-109cdbc0fcc3",
         "user_id": "123e4567-e89b-12d3-a456-426614174000",
         "content": "Newer chat for group chat",
-        "created_at": "2024-08-15T12:34:56Z",
-        "updated_at": "2024-06-15T14:00:00Z"
+        "created_at": "2024-05-15T12:34:56Z",
+        "updated_at": "2024-05-15T14:00:00Z"
     },
     {
         "id": "fdce59d3-ecca-4841-af74-9b854437629e",
         "chat_id": "fdce59d3-ecca-4841-af74-9b854437629e",
         "user_id": "78901234-5678-9012-3456-789012345678",
         "content": "One to one chat 1",
-        "created_at": "2024-06-15T12:34:56Z",
+        "created_at": "2024-05-15T12:34:56Z",
         "updated_at": null
     },
     {
@@ -28,7 +28,7 @@
         "chat_id": "fdce59d3-ecca-4841-af74-9b854437629e",
         "user_id": "123e4567-e89b-12d3-a456-426614174001",
         "content": "One to one chat 2 last",
-        "created_at": "2024-07-15T12:34:56Z",
+        "created_at": "2024-05-15T12:34:56Z",
         "updated_at": null
     }
 ]

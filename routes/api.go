@@ -31,4 +31,11 @@ func (r *Routes) Api() {
 	authService := service.NewAuthService(userRepository)
 	auth := handler.NewAuthHandler(authService)
 	authRoute.Post("/login", auth.Login)
+
+	// Message
+	messageRoute := app.Group("message")
+	messageRepository := repository.NewMessageRepository(conn)
+	messageService := service.NewMessageService(messageRepository)
+	message := handler.NewMessageHandler(messageService)
+	messageRoute.Post("/:room", middlewares.CheckAuth, message.Create)
 }
