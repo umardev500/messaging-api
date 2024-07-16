@@ -18,7 +18,7 @@ var clMu sync.Mutex
 func BroadcastChat(msg types.Broadcast, wg *sync.WaitGroup) {
 	mu.Lock()
 	defer mu.Unlock()
-	if wg == nil {
+	if wg != nil {
 		defer wg.Done()
 	}
 
@@ -48,11 +48,11 @@ func BroadcastChat(msg types.Broadcast, wg *sync.WaitGroup) {
 func BroadcastChatList(ctx context.Context, msg types.BroadcastChatList, wg *sync.WaitGroup) {
 	clMu.Lock()
 	defer clMu.Unlock()
-	if wg == nil {
+	if wg != nil {
 		defer wg.Done()
 	}
 
-	jsonBytes, err := storage.Redis.Get(ctx, msg.Room).Bytes()
+	jsonData, err := storage.Redis.JSONGet(ctx, msg.Room, "$").Result()
 	if err != nil {
 		if err == redis.Nil {
 			log.Error().Msgf("no room data found in redis cache")
@@ -63,13 +63,14 @@ func BroadcastChatList(ctx context.Context, msg types.BroadcastChatList, wg *syn
 		return
 	}
 
-	var userIds []string
-	if err := json.Unmarshal(jsonBytes, &userIds); err != nil {
-		log.Error().Msgf("failed marshaling room data | err: %v", err)
+	// Unmarshal it
+	var participantsData []types.RedisParticipants
+	if err := json.Unmarshal([]byte(jsonData), &participantsData); err != nil {
+		log.Error().Msgf("failed to unmarshal room data | err: %v", err)
 		return
 	}
 
-	for _, userId := range userIds {
+	for userId := range participantsData[0] {
 		var localMu sync.Mutex
 		go func(userId string) {
 			localMu.Lock()

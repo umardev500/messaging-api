@@ -81,11 +81,6 @@ func (c *chatService) PushNewChat(ctx context.Context, payload types.PushNewChat
 	resp.Ticket = ticket
 
 	payload.Participants = append(payload.Participants, payload.UserId)
-	participants, err := json.Marshal(payload.Participants)
-	if err != nil {
-		log.Error().Msgf("error marshaling participants: %v | ticket: %s", err, ticket)
-		return
-	}
 
 	var roomId = uuid.New().String() // replace with actual id returned after create new chat
 	payload.Room = roomId
@@ -113,7 +108,26 @@ func (c *chatService) PushNewChat(ctx context.Context, payload types.PushNewChat
 		return
 	}
 
-	if err = storage.Redis.Set(ctx, roomId, participants, 0).Err(); err != nil {
+	// Set redis
+	type RedisValue struct {
+		Blocked bool `json:"blocked"`
+	}
+
+	value := map[string]interface{}{}
+	for _, participant := range payload.Participants {
+		value[participant] = RedisValue{Blocked: false}
+	}
+
+	valueBytes, err := json.Marshal(value)
+
+	if err != nil {
+		log.Error().Msgf("failed to marshal value: %v | ticket: %s", err, ticket)
+		resp.Code = fiber.StatusInternalServerError
+		resp.Message = fiber.ErrInternalServerError.Message
+		return
+	}
+
+	if err = storage.Redis.JSONSet(ctx, roomId, "$", valueBytes).Err(); err != nil {
 		log.Error().Msgf("error setting redis: %v | ticket: %s", err, ticket)
 		resp.Code = fiber.StatusInternalServerError
 		resp.Message = fiber.ErrInternalServerError.Message

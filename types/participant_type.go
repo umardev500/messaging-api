@@ -13,3 +13,9 @@ type InputParticipant struct {
 	ChatId       string
 	Participants []string
 }
+
+type RedisParticipant struct {
+	Blocked bool `json:"blocked"`
+}
+
+type RedisParticipants map[string]RedisParticipant
