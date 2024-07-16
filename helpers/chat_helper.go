@@ -82,6 +82,7 @@ func BroadcastChatList(ctx context.Context, msg types.BroadcastChatList, wg *syn
 			err := conn.WriteJSON(msg)
 			if err != nil {
 				log.Error().Msgf("failed to write message %v", err)
+				delete(types.Onlines, userId)
 			}
 			localMu.Unlock()
 		}(userId)
