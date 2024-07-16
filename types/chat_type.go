@@ -12,6 +12,13 @@ type Client struct {
 	Mu   sync.Mutex
 }
 
+type Online struct {
+	Conn *websocket.Conn
+}
+
+var Onlines = make(map[string]*Online)
+var Rooms = make(map[string]map[string]*Client)
+
 type Broadcast struct {
 	Sender  string
 	Room    string

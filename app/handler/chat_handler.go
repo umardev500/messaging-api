@@ -27,19 +27,13 @@ func NewChatHandler(chatService domain.ChatService) domain.ChatHandler {
 	}
 }
 
-type Online struct {
-	Conn *websocket.Conn
-}
-
-var onlines = make(map[string]*Online)
-var rooms = make(map[string]map[string]*types.Client)
 var listMu, chatMu sync.Mutex
 
 // WsChatList is websocket handler to get realtime chat list
 func (ch *chatHandler) WsChatList() fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		tokenString := c.Query("token")
-		online := &Online{
+		online := &types.Online{
 			Conn: c,
 		}
 
@@ -56,16 +50,16 @@ func (ch *chatHandler) WsChatList() fiber.Handler {
 
 		// Add user to online group
 		listMu.Lock()
-		if _, ok := onlines[userId]; !ok {
-			onlines[userId] = &Online{}
+		if _, ok := types.Onlines[userId]; !ok {
+			types.Onlines[userId] = &types.Online{}
 		}
-		onlines[userId] = online
+		types.Onlines[userId] = online
 		listMu.Unlock()
 
 		// Remove disconnected user
 		defer func() {
 			listMu.Lock()
-			delete(onlines, userId)
+			delete(types.Onlines, userId)
 			listMu.Unlock()
 			c.Close()
 		}()
@@ -107,18 +101,18 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 		userData := resp.Data.(jwt.MapClaims)["user"].(map[string]interface{})
 		userId := userData["id"].(string)
 
-		// Appends user to rooms
+		// Appends user to types.Rooms
 		chatMu.Lock()
-		if _, ok := rooms[room]; !ok {
-			rooms[room] = make(map[string]*types.Client)
+		if _, ok := types.Rooms[room]; !ok {
+			types.Rooms[room] = make(map[string]*types.Client)
 		}
-		rooms[room][userId] = client
+		types.Rooms[room][userId] = client
 		chatMu.Unlock()
 
-		// Remove user from rooms
+		// Remove user from types.Rooms
 		defer func() {
 			chatMu.Lock()
-			delete(rooms[room], userId)
+			delete(types.Rooms[room], userId)
 			chatMu.Unlock()
 			c.Close()
 		}()
@@ -134,7 +128,7 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 			broadcastData := types.Broadcast{
 				Sender:  userId,
 				Room:    room,
-				Clients: rooms[room],
+				Clients: types.Rooms[room],
 				Message: string(msg),
 			}
 			go ch.broadcastMessage(broadcastData)
@@ -184,7 +178,7 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 	// Push incoming chat to the chat list
 	// We get participant data from redis cache
 	// And then we push new chat to the chat list
-	// First we matching does list of participants is exist in the onlines variable
+	// First we matching does list of participants is exist in the types.Onlines variable
 	// If yes then we push it otherwise skip it
 	// And skip to push to sender chat list
 	b, err := storage.Redis.Get(msg.Room)
@@ -203,7 +197,7 @@ func (ch *chatHandler) broadcastMessage(msg types.Broadcast) {
 		var localMu sync.Mutex
 		go func(userId string) {
 			localMu.Lock()
-			online, ok := onlines[userId]
+			online, ok := types.Onlines[userId]
 			if !ok {
 				return
 			}
@@ -249,7 +243,7 @@ func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
 		var localMu sync.Mutex
 		go func(participant string, resp types.Response) {
 			localMu.Lock()
-			if online, ok := onlines[participant]; ok {
+			if online, ok := types.Onlines[participant]; ok {
 				log.Debug().Msg("Participant is online ready to push new chat list")
 
 				err := online.Conn.WriteJSON(resp.Data)
