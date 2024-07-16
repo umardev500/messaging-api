@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
+	"github.com/umardev500/messaging-api/helpers"
 	"github.com/umardev500/messaging-api/types"
 	"github.com/umardev500/messaging-api/utils"
 )
@@ -41,6 +43,22 @@ func (m *messageService) CreateMessage(ctx context.Context, payload types.Create
 		log.Error().Msgf("error when creating message | err: %v | ticket: %s", err, resp.Ticket)
 		return resp
 	}
+
+	// Do broadcasting message
+	var broadcastData = types.Broadcast{
+		Sender:  userId,
+		Room:    payload.ChatId,
+		Message: payload.Content,
+	}
+	helpers.BroadcastChat(broadcastData)
+
+	// Broadcast chatlist
+	var broadcastChatList = types.BroadcastChatList{
+		Room:      payload.ChatId,
+		Message:   payload.Content,
+		Timestamp: time.Now().UTC().Unix(),
+	}
+	helpers.BroadcastChatList(broadcastChatList)
 
 	resp.Code = fiber.StatusCreated
 	resp.Message = "Success"

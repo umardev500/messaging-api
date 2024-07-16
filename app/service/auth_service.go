@@ -75,7 +75,7 @@ func (s *authService) Login(ctx context.Context, payload types.LoginPayload) typ
 	}
 	claims := jwt.MapClaims{
 		"user": userClaim,
-		"exp":  time.Now().Add(time.Hour * 24).Unix(),
+		"exp":  time.Now().Add(time.Hour * 168).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString(key)

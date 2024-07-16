@@ -67,6 +67,7 @@ func (ch *chatHandler) WsChatList() fiber.Handler {
 		// @Todo
 		// We do fetch chat list of connected user
 		//
+		fmt.Println(types.Onlines)
 
 		// Listen for incoming message
 		for {
