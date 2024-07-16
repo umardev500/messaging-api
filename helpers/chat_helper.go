@@ -18,7 +18,9 @@ var clMu sync.Mutex
 func BroadcastChat(msg types.Broadcast, wg *sync.WaitGroup) {
 	mu.Lock()
 	defer mu.Unlock()
-	defer wg.Done()
+	if wg == nil {
+		defer wg.Done()
+	}
 
 	theRoom := types.Rooms[msg.Room]
 
@@ -46,7 +48,9 @@ func BroadcastChat(msg types.Broadcast, wg *sync.WaitGroup) {
 func BroadcastChatList(ctx context.Context, msg types.BroadcastChatList, wg *sync.WaitGroup) {
 	clMu.Lock()
 	defer clMu.Unlock()
-	defer wg.Done()
+	if wg == nil {
+		defer wg.Done()
+	}
 
 	jsonBytes, err := storage.Redis.Get(ctx, msg.Room).Bytes()
 	if err != nil {
