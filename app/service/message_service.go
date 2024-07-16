@@ -58,7 +58,7 @@ func (m *messageService) CreateMessage(ctx context.Context, payload types.Create
 		Message:   payload.Content,
 		Timestamp: time.Now().UTC().Unix(),
 	}
-	helpers.BroadcastChatList(broadcastChatList)
+	helpers.BroadcastChatList(ctx, broadcastChatList)
 
 	resp.Code = fiber.StatusCreated
 	resp.Message = "Success"

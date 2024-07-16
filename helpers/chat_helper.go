@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"sync"
@@ -39,11 +40,11 @@ func BroadcastChat(msg types.Broadcast) {
 	}
 }
 
-func BroadcastChatList(msg types.BroadcastChatList) {
+func BroadcastChatList(ctx context.Context, msg types.BroadcastChatList) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	jsonBytes, err := storage.Redis.Get(msg.Room)
+	jsonBytes, err := storage.Redis.Get(ctx, msg.Room).Bytes()
 	if err != nil {
 		log.Error().Msgf("failed to get room data from redis cache")
 		return

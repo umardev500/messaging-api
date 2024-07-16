@@ -113,7 +113,7 @@ func (c *chatService) PushNewChat(ctx context.Context, payload types.PushNewChat
 		return
 	}
 
-	if err = storage.Redis.Set(roomId, participants, 0); err != nil {
+	if err = storage.Redis.Set(ctx, roomId, participants, 0).Err(); err != nil {
 		log.Error().Msgf("error setting redis: %v | ticket: %s", err, ticket)
 		resp.Code = fiber.StatusInternalServerError
 		resp.Message = fiber.ErrInternalServerError.Message
