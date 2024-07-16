@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -50,7 +51,11 @@ func (m *messageService) CreateMessage(ctx context.Context, payload types.Create
 		Room:    payload.ChatId,
 		Message: payload.Content,
 	}
-	helpers.BroadcastChat(broadcastData)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go helpers.BroadcastChat(broadcastData, &wg)
 
 	// Broadcast chatlist
 	var broadcastChatList = types.BroadcastChatList{
@@ -58,7 +63,10 @@ func (m *messageService) CreateMessage(ctx context.Context, payload types.Create
 		Message:   payload.Content,
 		Timestamp: time.Now().UTC().Unix(),
 	}
-	helpers.BroadcastChatList(ctx, broadcastChatList)
+
+	go helpers.BroadcastChatList(ctx, broadcastChatList, &wg)
+
+	wg.Wait()
 
 	resp.Code = fiber.StatusCreated
 	resp.Message = "Success"

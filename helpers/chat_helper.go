@@ -3,20 +3,23 @@ package helpers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"sync"
 
 	"github.com/fasthttp/websocket"
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/storage"
 	"github.com/umardev500/messaging-api/types"
 )
 
 var mu sync.Mutex
+var clMu sync.Mutex
 
-func BroadcastChat(msg types.Broadcast) {
+func BroadcastChat(msg types.Broadcast, wg *sync.WaitGroup) {
 	mu.Lock()
 	defer mu.Unlock()
+	defer wg.Done()
+
 	theRoom := types.Rooms[msg.Room]
 
 	for clientId, client := range theRoom {
@@ -40,19 +43,19 @@ func BroadcastChat(msg types.Broadcast) {
 	}
 }
 
-func BroadcastChatList(ctx context.Context, msg types.BroadcastChatList) {
-	mu.Lock()
-	defer mu.Unlock()
+func BroadcastChatList(ctx context.Context, msg types.BroadcastChatList, wg *sync.WaitGroup) {
+	clMu.Lock()
+	defer clMu.Unlock()
+	defer wg.Done()
 
 	jsonBytes, err := storage.Redis.Get(ctx, msg.Room).Bytes()
 	if err != nil {
-		log.Error().Msgf("failed to get room data from redis cache")
-		return
-	}
+		if err == redis.Nil {
+			log.Error().Msgf("no room data found in redis cache")
+			return
+		}
 
-	fmt.Println(jsonBytes)
-	if len(jsonBytes) == 0 {
-		log.Error().Msgf("no room data found in redis cache")
+		log.Error().Msgf("failed to get room data from redis cache")
 		return
 	}
 
