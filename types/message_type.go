@@ -21,3 +21,17 @@ type CreateMessage struct {
 	UserId  string `json:"-"` // get from token
 	Content string `json:"content"`
 }
+
+// Fetch data
+type GetMessageType string
+
+const (
+	MessageDown GetMessageType = "down"
+	MessageUp   GetMessageType = "up"
+)
+
+type GetMessageParams struct {
+	Type   GetMessageType `json:"type"`
+	ChatId string         `json:"-"`
+	Date   time.Time      `json:"date"`
+}

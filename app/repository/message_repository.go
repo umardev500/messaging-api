@@ -18,6 +18,47 @@ func NewMessageRepository(conn *config.PgxConfig) domain.MessageRepository {
 	}
 }
 
+func (m *messageRepitory) GetMessage(ctx context.Context, params types.GetMessageParams) ([]types.Message, error) {
+	q := m.conn.TrOrDB(ctx)
+	var sql string
+
+	if params.Type == types.MessageDown {
+		sql = `--sql
+		SELECT id, chat_id, user_id, content, created_at, updated_at
+		FROM messages
+		WHERE chat_id = $1
+		ORDER BY created_at > $2
+		LIMIT 10
+	`
+	} else {
+		sql = `--sql
+		SELECT id, chat_id, user_id, content, created_at, updated_at
+		FROM messages
+		WHERE chat_id = $1
+		ORDER BY created_at < $2
+		LIMIT 10
+	`
+	}
+
+	rows, err := q.Query(ctx, sql, params.ChatId, params.Date)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var rowsData []types.Message
+	for rows.Next() {
+		var row types.Message
+		if err := rows.Scan(&row.Id, &row.ChatId, &row.UserId, &row.Content, &row.CreatedAt, &row.UpdatedAt); err != nil {
+			return nil, err
+		}
+		rowsData = append(rowsData, row)
+	}
+
+	return rowsData, nil
+}
+
 func (m *messageRepitory) Create(ctx context.Context, payload types.CreateMessage) error {
 	q := m.conn.TrOrDB(ctx)
 	sql := `--sql

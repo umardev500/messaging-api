@@ -17,4 +17,5 @@ type MessageService interface {
 
 type MessageRepository interface {
 	Create(ctx context.Context, payload types.CreateMessage) error
+	GetMessage(ctx context.Context, params types.GetMessageParams) ([]types.Message, error)
 }
