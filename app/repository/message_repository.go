@@ -26,16 +26,16 @@ func (m *messageRepitory) GetMessage(ctx context.Context, params types.GetMessag
 		sql = `--sql
 		SELECT id, chat_id, user_id, content, created_at, updated_at
 		FROM messages
-		WHERE chat_id = $1
-		ORDER BY created_at > $2
+		WHERE chat_id = $1 AND created_at > $2
+		ORDER BY created_at
 		LIMIT 10
 	`
 	} else {
 		sql = `--sql
 		SELECT id, chat_id, user_id, content, created_at, updated_at
 		FROM messages
-		WHERE chat_id = $1
-		ORDER BY created_at < $2
+		WHERE chat_id = $1 AND created_at < $2
+		ORDER BY created_at
 		LIMIT 10
 	`
 	}

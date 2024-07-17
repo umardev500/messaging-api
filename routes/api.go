@@ -38,4 +38,5 @@ func (r *Routes) Api() {
 	messageService := service.NewMessageService(messageRepository)
 	message := handler.NewMessageHandler(messageService)
 	messageRoute.Post("/:room", middlewares.CheckAuth, message.Create)
+	messageRoute.Get("/:room", middlewares.CheckAuth, message.GetMessage)
 }

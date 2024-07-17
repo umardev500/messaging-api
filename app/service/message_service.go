@@ -7,7 +7,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
 	"github.com/umardev500/messaging-api/helpers"
@@ -40,12 +39,6 @@ func (m *messageService) GetMessage(ctx context.Context, params types.GetMessage
 			Date:   params.Date,
 		})
 		if err != nil {
-			if err == pgx.ErrNoRows {
-				resp.Code = fiber.StatusNotFound
-				resp.Message = fiber.ErrNotFound.Message
-				return resp
-			}
-
 			log.Error().Msgf("error when get message | err: %v | ticket: %s", err, resp.Ticket)
 			return resp
 		}
@@ -56,12 +49,6 @@ func (m *messageService) GetMessage(ctx context.Context, params types.GetMessage
 			Date:   params.Date,
 		})
 		if err != nil {
-			if err == pgx.ErrNoRows {
-				resp.Code = fiber.StatusNotFound
-				resp.Message = fiber.ErrNotFound.Message
-				return resp
-			}
-
 			log.Error().Msgf("error when get message | err: %v | ticket: %s", err, resp.Ticket)
 			return resp
 		}

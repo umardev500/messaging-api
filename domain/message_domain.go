@@ -9,6 +9,7 @@ import (
 
 type MessageHandler interface {
 	Create(c *fiber.Ctx) error
+	GetMessage(c *fiber.Ctx) error
 }
 
 type MessageService interface {
