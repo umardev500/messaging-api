@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
 	"github.com/umardev500/messaging-api/helpers"
@@ -22,6 +23,53 @@ func NewMessageService(messageRepository domain.MessageRepository) domain.Messag
 	return &messageService{
 		messageRepository: messageRepository,
 	}
+}
+
+func (m *messageService) GetMessage(ctx context.Context, params types.GetMessageParams) types.Response {
+	var resp = types.Response{
+		Ticket:  uuid.New().String(),
+		Code:    fiber.StatusInternalServerError,
+		Message: fiber.ErrInternalServerError.Message,
+	}
+	var err error
+
+	if params.Type == types.MessageDown {
+		resp.Data, err = m.messageRepository.GetMessage(ctx, types.GetMessageParams{
+			ChatId: params.ChatId,
+			Type:   types.MessageDown,
+			Date:   params.Date,
+		})
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				resp.Code = fiber.StatusNotFound
+				resp.Message = fiber.ErrNotFound.Message
+				return resp
+			}
+
+			log.Error().Msgf("error when get message | err: %v | ticket: %s", err, resp.Ticket)
+			return resp
+		}
+	} else {
+		resp.Data, err = m.messageRepository.GetMessage(ctx, types.GetMessageParams{
+			ChatId: params.ChatId,
+			Type:   types.MessageUp,
+			Date:   params.Date,
+		})
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				resp.Code = fiber.StatusNotFound
+				resp.Message = fiber.ErrNotFound.Message
+				return resp
+			}
+
+			log.Error().Msgf("error when get message | err: %v | ticket: %s", err, resp.Ticket)
+			return resp
+		}
+	}
+
+	resp.Code = fiber.StatusOK
+	resp.Message = "Get message success"
+	return resp
 }
 
 func (m *messageService) CreateMessage(ctx context.Context, payload types.CreateMessage) types.Response {

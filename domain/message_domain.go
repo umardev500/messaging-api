@@ -13,6 +13,7 @@ type MessageHandler interface {
 
 type MessageService interface {
 	CreateMessage(ctx context.Context, payload types.CreateMessage) types.Response
+	GetMessage(ctx context.Context, params types.GetMessageParams) types.Response
 }
 
 type MessageRepository interface {
