@@ -62,8 +62,8 @@ type GetChatListParam struct {
 }
 
 type ChatList struct {
-	Id              string    `json:"id"`
-	ChatName        string    `json:"chat_name"`
-	Content         string    `json:"content"`
-	LastMessageDate time.Time `json:"last_message_date"`
+	Id          string    `json:"id"`
+	ChatName    string    `json:"chat_name"`
+	Content     string    `json:"content"`
+	LastMsgDate time.Time `json:"last_msg_date"`
 }

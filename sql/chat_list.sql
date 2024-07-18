@@ -10,8 +10,8 @@ SELECT c.id,
             LIMIT 1
         )
     END AS chat_name,
-    m.content,
-    m.created_at
+    m.content as msg_higlight,
+    m.created_at as last_msg_date
 FROM chats c
     JOIN chat_participants cp ON c.id = cp.chat_id
     LEFT JOIN LATERAL (

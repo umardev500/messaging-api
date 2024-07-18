@@ -21,4 +21,5 @@ type ChatService interface {
 
 type ChatRepository interface {
 	CreateChat(ctx context.Context, payload types.PushNewChatPayload) error
+	GetChatList(ctx context.Context, param types.GetChatListParam) (types.ChatList, error)
 }
