@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/umardev500/messaging-api/domain"
 	"github.com/umardev500/messaging-api/types"
+	"github.com/umardev500/messaging-api/utils"
 )
 
 type messageHandler struct {
@@ -25,20 +26,9 @@ func (m *messageHandler) GetMessage(c *fiber.Ctx) error {
 	var msgType = c.Query("type")
 	var date = c.Query("date")
 
-	parsedDate, err := time.Parse(time.RFC3339, date)
+	err := utils.ValidateDateResp(date, c)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(types.Response{
-			Code:    fiber.StatusBadRequest,
-			Message: fiber.ErrBadRequest.Message,
-			Error: &types.Error{
-				Code: types.ValidationErr,
-				Details: types.ErrDetail{
-					Field:  "date",
-					Filter: "=",
-					Detail: "date must be in RFC3339 format",
-				},
-			},
-		})
+		return err
 	}
 
 	ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
@@ -47,7 +37,7 @@ func (m *messageHandler) GetMessage(c *fiber.Ctx) error {
 	resp := m.messageService.GetMessage(ctx, types.GetMessageParams{
 		ChatId: room,
 		Type:   types.GetMessageType(msgType),
-		Date:   parsedDate,
+		Date:   date,
 	})
 
 	return c.Status(resp.Code).JSON(resp)

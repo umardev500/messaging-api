@@ -33,5 +33,5 @@ const (
 type GetMessageParams struct {
 	Type   GetMessageType `json:"type"`
 	ChatId string         `json:"-"`
-	Date   time.Time      `json:"date"`
+	Date   string         `json:"date"`
 }
