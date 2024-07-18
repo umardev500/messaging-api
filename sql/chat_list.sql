@@ -23,4 +23,5 @@ FROM chats c
         LIMIT 1
     ) m ON TRUE
 WHERE cp.user_id = '78901234-5678-9012-3456-789012345678'
+    AND m.created_at > '2024-05-15T12:34:56Z'
 ORDER BY m.created_at DESC
