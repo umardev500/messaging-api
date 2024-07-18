@@ -87,17 +87,17 @@ func (m *messageService) CreateMessage(ctx context.Context, payload types.Create
 		Message: payload.Content,
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(2)
-
-	go helpers.BroadcastChat(broadcastData, &wg)
-
 	// Broadcast chatlist
 	var broadcastChatList = types.BroadcastChatList{
 		Room:      payload.ChatId,
 		Message:   payload.Content,
 		Timestamp: time.Now().UTC().Unix(),
 	}
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go helpers.BroadcastChat(broadcastData, &wg)
 
 	go helpers.BroadcastChatList(ctx, broadcastChatList, &wg)
 
