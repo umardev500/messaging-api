@@ -28,15 +28,15 @@ func (m *messageHandler) GetMessage(c *fiber.Ctx) error {
 	var date = c.Query("date")
 	var ticket = uuid.New().String()
 
-	handler, err := utils.ValidateDateResp(date, c)
+	ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
+	defer cancel()
+	ctx = context.WithValue(ctx, types.ProcIdKey, ticket)
+
+	handler, err := utils.ValidateDateResp(ctx, date, c)
 	if err != nil {
 		log.Error().Msgf("date validation failed | err: %v | ticket: %s", err, ticket)
 		return handler
 	}
-
-	ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
-	defer cancel()
-	ctx = context.WithValue(ctx, types.ProcIdKey, ticket)
 
 	resp := m.messageService.GetMessage(ctx, types.GetMessageParams{
 		ChatId: room,

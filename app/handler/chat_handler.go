@@ -32,15 +32,16 @@ func (ch *chatHandler) GetChatList(c *fiber.Ctx) error {
 	var date = c.Query("date")
 	var ticket = uuid.New().String()
 
-	handler, err := utils.ValidateDateResp(date, c)
+	ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
+	defer cancel()
+	ctx = context.WithValue(ctx, types.ProcIdKey, ticket)
+
+	handler, err := utils.ValidateDateResp(ctx, date, c)
 	if err != nil {
 		log.Error().Msgf("date validation failed | err: %v | ticket: %s", err, ticket)
 		return handler
 	}
 
-	ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
-	defer cancel()
-	ctx = context.WithValue(ctx, types.ProcIdKey, ticket)
 	userId, err := utils.GetUserIdFromLocals(ctx)
 	if err != nil {
 		log.Error().Msgf("failed to get user id from locals | err: %v | ticket: %s", err, ticket)
