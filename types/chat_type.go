@@ -54,3 +54,16 @@ type Chat struct {
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
+
+// Get chat list
+type GetChatListParam struct {
+	UserId string    `json:"-"`
+	Date   time.Time `json:"date"`
+}
+
+type ChatList struct {
+	Id              string    `json:"id"`
+	ChatName        string    `json:"chat_name"`
+	Content         string    `json:"content"`
+	LastMessageDate time.Time `json:"last_message_date"`
+}
