@@ -30,6 +30,25 @@ func NewChatService(chatRepository domain.ChatRepository, participantRepository 
 	}
 }
 
+func (c *chatService) GetChatList(ctx context.Context, param types.GetChatListParam) types.Response {
+	var resp types.Response = types.Response{
+		Ticket:  ctx.Value(types.ProcIdKey).(string),
+		Code:    fiber.ErrInternalServerError.Code,
+		Message: fiber.ErrInternalServerError.Message,
+	}
+
+	cl, err := c.chatRepository.GetChatList(ctx, param)
+	if err != nil {
+		log.Error().Msgf("error when get chatlist | err: %v | ticket: %s", err, resp.Ticket)
+		return resp
+	}
+
+	resp.Data = cl
+	resp.Code = fiber.StatusOK
+	resp.Message = "Get chat list"
+	return resp
+}
+
 func (c *chatService) GetClaims(tokenString string) (types.Response, error) {
 	var ticket = uuid.New().String()
 
