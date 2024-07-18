@@ -26,7 +26,7 @@ func NewMessageService(messageRepository domain.MessageRepository) domain.Messag
 
 func (m *messageService) GetMessage(ctx context.Context, params types.GetMessageParams) types.Response {
 	var resp = types.Response{
-		Ticket:  uuid.New().String(),
+		Ticket:  ctx.Value(types.ProcIdKey).(string),
 		Code:    fiber.StatusInternalServerError,
 		Message: fiber.ErrInternalServerError.Message,
 	}

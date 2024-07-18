@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
 	"github.com/umardev500/messaging-api/types"
 	"github.com/umardev500/messaging-api/utils"
@@ -25,14 +26,17 @@ func (m *messageHandler) GetMessage(c *fiber.Ctx) error {
 	var room = c.Params("room")
 	var msgType = c.Query("type")
 	var date = c.Query("date")
+	var ticket = uuid.New().String()
 
-	err := utils.ValidateDateResp(date, c)
+	handler, err := utils.ValidateDateResp(date, c)
 	if err != nil {
-		return err
+		log.Error().Msgf("date validation failed | err: %v | ticket: %s", err, ticket)
+		return handler
 	}
 
 	ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
 	defer cancel()
+	ctx = context.WithValue(ctx, types.ProcIdKey, ticket)
 
 	resp := m.messageService.GetMessage(ctx, types.GetMessageParams{
 		ChatId: room,

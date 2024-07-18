@@ -21,8 +21,9 @@ func (r *Routes) Api() {
 	chatService := service.NewChatService(chatRepository, participantRepository, conn)
 	chat := handler.NewChatHandler(chatService)
 	chatRoute := app.Group("chat")
-	chatRoute.Get("/list", chat.WsChatList())
-	chatRoute.Get("/:room", chat.WsChat())
+	chatRoute.Get("/list", chat.WsChatList()) // ws
+	chatRoute.Get("/chat_list", middlewares.CheckAuth, chat.GetChatList)
+	chatRoute.Get("/:room", chat.WsChat()) // ws
 	chatRoute.Post("/new", middlewares.CheckAuth, chat.PushNewChat)
 
 	// Auth

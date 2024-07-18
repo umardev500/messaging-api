@@ -57,8 +57,8 @@ type Chat struct {
 
 // Get chat list
 type GetChatListParam struct {
-	UserId string    `json:"-"`
-	Date   time.Time `json:"date"`
+	UserId string `json:"-"`
+	Date   string `json:"date"`
 }
 
 type ChatList struct {

@@ -11,6 +11,7 @@ type ChatHandler interface {
 	WsChatList() fiber.Handler
 	WsChat() fiber.Handler
 	PushNewChat(c *fiber.Ctx) error
+	GetChatList(c *fiber.Ctx) error
 }
 
 type ChatService interface {

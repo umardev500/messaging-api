@@ -9,9 +9,11 @@ import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
 	"github.com/umardev500/messaging-api/types"
+	"github.com/umardev500/messaging-api/utils"
 )
 
 type chatHandler struct {
@@ -25,6 +27,36 @@ func NewChatHandler(chatService domain.ChatService) domain.ChatHandler {
 }
 
 var listMu, chatMu sync.Mutex
+
+func (ch *chatHandler) GetChatList(c *fiber.Ctx) error {
+	var date = c.Query("date")
+	var ticket = uuid.New().String()
+
+	handler, err := utils.ValidateDateResp(date, c)
+	if err != nil {
+		log.Error().Msgf("date validation failed | err: %v | ticket: %s", err, ticket)
+		return handler
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
+	defer cancel()
+	ctx = context.WithValue(ctx, types.ProcIdKey, ticket)
+	userId, err := utils.GetUserIdFromLocals(ctx)
+	if err != nil {
+		log.Error().Msgf("failed to get user id from locals | err: %v | ticket: %s", err, ticket)
+		return c.Status(fiber.StatusInternalServerError).JSON(types.Response{
+			Code:    fiber.StatusInternalServerError,
+			Message: fiber.ErrInternalServerError.Message,
+		})
+	}
+
+	resp := ch.chatService.GetChatList(ctx, types.GetChatListParam{
+		UserId: userId,
+		Date:   date,
+	})
+
+	return c.Status(resp.Code).JSON(resp)
+}
 
 // WsChatList is websocket handler to get realtime chat list
 func (ch *chatHandler) WsChatList() fiber.Handler {
