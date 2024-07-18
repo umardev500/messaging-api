@@ -39,7 +39,7 @@ type InputNewMessage struct {
 	Text   *string `json:"text"`
 }
 
-type PushNewChatPayload struct {
+type CreateNewChatPayload struct {
 	UserId       string          `json:"-"`
 	Room         string          `json:"-"`            // Auto
 	ChatName     *string         `json:"chat_name"`    // if filled that indicate the chat group otherwise that one to one chat

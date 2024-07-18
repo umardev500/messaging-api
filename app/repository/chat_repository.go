@@ -75,7 +75,7 @@ func (cr *chatRepository) GetChatList(ctx context.Context, param types.GetChatLi
 	return chatList, nil
 }
 
-func (cr *chatRepository) CreateChat(ctx context.Context, payload types.PushNewChatPayload) (err error) {
+func (cr *chatRepository) CreateChat(ctx context.Context, payload types.CreateNewChatPayload) (err error) {
 	q := cr.conn.TrOrDB(ctx)
 	sql := `--sql
 		INSERT INTO chats (id, chat_name) VALUES ($1, $2)

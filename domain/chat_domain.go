@@ -16,12 +16,12 @@ type ChatHandler interface {
 
 type ChatService interface {
 	SaveMessage(ctx context.Context, data types.InputNewMessage)
-	PushNewChat(ctx context.Context, payload types.PushNewChatPayload) (types.Response, error)
+	PushNewChat(ctx context.Context, payload types.CreateNewChatPayload) (types.Response, error)
 	GetClaims(tokenString string) (types.Response, error)
 	GetChatList(ctx context.Context, param types.GetChatListParam) types.Response
 }
 
 type ChatRepository interface {
-	CreateChat(ctx context.Context, payload types.PushNewChatPayload) error
+	CreateChat(ctx context.Context, payload types.CreateNewChatPayload) error
 	GetChatList(ctx context.Context, param types.GetChatListParam) ([]types.ChatList, error)
 }

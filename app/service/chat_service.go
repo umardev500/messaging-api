@@ -94,7 +94,7 @@ func (c *chatService) GetClaims(tokenString string) (types.Response, error) {
 
 func (c *chatService) SaveMessage(ctx context.Context, data types.InputNewMessage) {}
 
-func (c *chatService) PushNewChat(ctx context.Context, payload types.PushNewChatPayload) (resp types.Response, err error) {
+func (c *chatService) PushNewChat(ctx context.Context, payload types.CreateNewChatPayload) (resp types.Response, err error) {
 	timestamp := time.Now().UTC().Unix()
 	ticket := uuid.New().String()
 	resp.Ticket = ticket

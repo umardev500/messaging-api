@@ -161,7 +161,7 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 
 func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
 	// Parsing
-	var payload types.PushNewChatPayload
+	var payload types.CreateNewChatPayload
 	if err := c.BodyParser(&payload); err != nil {
 		fmt.Println(err)
 		return c.SendStatus(fiber.StatusBadRequest)
