@@ -159,7 +159,7 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 	})
 }
 
-func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
+func (ch *chatHandler) CreateNewChat(c *fiber.Ctx) error {
 	// Parsing
 	var payload types.CreateNewChatPayload
 	if err := c.BodyParser(&payload); err != nil {
@@ -172,7 +172,7 @@ func (ch *chatHandler) PushNewChat(c *fiber.Ctx) error {
 	// Proccessing intialization of new chat
 	var userId = "78901234-5678-9012-3456-789012345678"
 	payload.UserId = userId
-	resp, err := ch.chatService.PushNewChat(ctx, payload)
+	resp, err := ch.chatService.CreateNewChat(ctx, payload)
 	if err != nil {
 		return c.Status(resp.Code).JSON(resp)
 	}

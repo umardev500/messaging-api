@@ -24,7 +24,7 @@ func (r *Routes) Api() {
 	chatRoute.Get("/list", chat.WsChatList()) // ws
 	chatRoute.Get("/chat_list", middlewares.CheckAuth, chat.GetChatList)
 	chatRoute.Get("/:room", chat.WsChat()) // ws
-	chatRoute.Post("/new", middlewares.CheckAuth, chat.PushNewChat)
+	chatRoute.Post("/new", middlewares.CheckAuth, chat.CreateNewChat)
 
 	// Auth
 	authRoute := app.Group("auth")
