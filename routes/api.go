@@ -1,7 +1,10 @@
 package routes
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/umardev500/messaging-api/app/handler"
 	"github.com/umardev500/messaging-api/app/repository"
 	"github.com/umardev500/messaging-api/app/service"
@@ -12,6 +15,9 @@ import (
 func (r *Routes) Api() {
 	app := r.app.Group("api")
 	app.Use(cors.New())
+	app.Use("/static", filesystem.New(filesystem.Config{
+		Root: http.Dir(config.GetConfig().Upload.Path),
+	}))
 
 	// Connection
 	conn := config.NewPgx()
