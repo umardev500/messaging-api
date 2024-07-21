@@ -12,10 +12,16 @@ import (
 func UploadMiddleware(uploadPath string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ticket := uuid.New().String()
+		var resp = types.Response{
+			Ticket: ticket,
+		}
 
 		fileHeader, err := c.FormFile("file")
 		if err != nil {
-			return err
+			log.Err(err).Msgf("error getting file | err : %v", err)
+			resp.Message = fiber.ErrBadRequest.Message
+
+			return c.Status(fiber.StatusBadRequest).JSON(resp)
 		}
 
 		var dir = config.GetConfig().Upload.Path
@@ -26,11 +32,8 @@ func UploadMiddleware(uploadPath string) fiber.Handler {
 			return err
 		}
 
-		var resp = types.Response{
-			Ticket: ticket,
-			Data: helpers.UploadResponse{
-				Location: location,
-			},
+		resp.Data = helpers.UploadResponse{
+			Location: location,
 		}
 		return c.JSON(resp)
 	}
