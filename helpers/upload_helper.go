@@ -4,7 +4,9 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+	"path/filepath"
 
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -33,7 +35,7 @@ func UploadFile(file *multipart.FileHeader, uploadPath string) (location string,
 		log.Info().Msgf("Directory created: %s", uploadPath)
 	}
 
-	name := uploadPath + file.Filename
+	name := uploadPath + uuid.New().String() + filepath.Ext(file.Filename)
 	err = os.WriteFile(name, content, 0644)
 	if err != nil {
 		return
