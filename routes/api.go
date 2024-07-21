@@ -31,5 +31,7 @@ func (r *Routes) Api() {
 	injects.Message()
 
 	// Upload
-	app.Post("/upload", middlewares.UploadMiddleware(config.GetConfig().Upload.Path))
+	uploadRoute := app.Group("upload")
+	uploadRoute.Post("/", middlewares.UploadMiddleware(config.GetConfig().Upload.Path))
+	uploadRoute.Put("/", middlewares.UpdateUploadMiddleware(config.GetConfig().Upload.Path))
 }
