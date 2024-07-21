@@ -4,7 +4,21 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
+
+func FiberUploadFileHandler(c *fiber.Ctx) error {
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		return err
+	}
+
+	UploadFile(fileHeader, "uploads/")
+
+	return nil
+}
 
 func UploadFile(file *multipart.FileHeader, uploadPath string) (location string, err error) {
 	src, err := file.Open()
@@ -16,6 +30,15 @@ func UploadFile(file *multipart.FileHeader, uploadPath string) (location string,
 	content, err := io.ReadAll(src)
 	if err != nil {
 		return
+	}
+
+	// Check for directory
+	if _, err := os.Stat(uploadPath); os.IsNotExist(err) {
+		if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
+			return "", err
+		}
+
+		log.Info().Msgf("Directory created: %s", uploadPath)
 	}
 
 	name := uploadPath + file.Filename
