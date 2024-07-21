@@ -1,23 +1,15 @@
-package utils
+package helpers
 
 import (
 	"io"
 	"mime/multipart"
 	"os"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 )
 
-func FiberUploadFileHandler(c *fiber.Ctx) error {
-	fileHeader, err := c.FormFile("file")
-	if err != nil {
-		return err
-	}
-
-	UploadFile(fileHeader, "uploads/")
-
-	return nil
+type UploadResponse struct {
+	Location string `json:"location"`
 }
 
 func UploadFile(file *multipart.FileHeader, uploadPath string) (location string, err error) {

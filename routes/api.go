@@ -40,4 +40,7 @@ func (r *Routes) Api() {
 	message := handler.NewMessageHandler(messageService)
 	messageRoute.Post("/:room", middlewares.CheckAuth, message.Create)
 	messageRoute.Get("/:room", middlewares.CheckAuth, message.GetMessage)
+
+	// Upload
+	app.Post("/upload", middlewares.UploadMiddleware(config.GetConfig().Upload.Path))
 }
