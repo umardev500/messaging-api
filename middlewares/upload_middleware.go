@@ -35,16 +35,14 @@ func UpdateUploadMiddleware(uploadPath string) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(resp)
 		}
 
-		location, err := helpers.UploadFile(fileHeader, dir, &filename)
+		uploadResp, err := helpers.UploadFile(fileHeader, dir, &filename)
 		if err != nil {
 			log.Err(err).Msgf("error uploading file to server | err : %v", err)
 			return err
 		}
 
 		resp.Message = "Replace upload"
-		resp.Data = helpers.UploadResponse{
-			Location: location,
-		}
+		resp.Data = uploadResp
 		return c.JSON(resp)
 	}
 }
@@ -66,16 +64,14 @@ func UploadMiddleware(uploadPath string) fiber.Handler {
 
 		var dir = config.GetConfig().Upload.Path
 
-		location, err := helpers.UploadFile(fileHeader, dir, nil)
+		uploadResp, err := helpers.UploadFile(fileHeader, dir, nil)
 		if err != nil {
 			log.Err(err).Msgf("error uploading file to server | err : %v", err)
 			return err
 		}
 
 		resp.Message = "Upload file"
-		resp.Data = helpers.UploadResponse{
-			Location: location,
-		}
+		resp.Data = uploadResp
 		return c.JSON(resp)
 	}
 }

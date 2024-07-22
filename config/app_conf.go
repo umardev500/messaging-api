@@ -12,12 +12,14 @@ var (
 )
 
 type Server struct {
-	Port string
-	Host string
+	Protocol string
+	Port     string
+	Host     string
 }
 
 type Upload struct {
-	Path string
+	Path      string
+	StaticUrl string
 }
 
 type Database struct {
@@ -36,13 +38,17 @@ type AppConfig struct {
 
 func GetConfig() *AppConfig {
 	configOnce.Do(func() {
+		var server = Server{
+			Protocol: utils.GetEnv("PROTOCOL", "http://"),
+			Port:     utils.GetEnv("PORT", "3000"),
+			Host:     utils.GetEnv("HOST", "0.0.0.0"),
+		}
+
 		configInstance = &AppConfig{
-			Server: Server{
-				Port: utils.GetEnv("PORT", "3000"),
-				Host: utils.GetEnv("HOST", "0.0.0.0"),
-			},
+			Server: server,
 			Upload: Upload{
-				Path: utils.GetEnv("UPLOAD_PATH", "public/uploads/"),
+				Path:      utils.GetEnv("UPLOAD_PATH", "public/uploads/"),
+				StaticUrl: server.Protocol + server.Host + ":" + server.Port + "/api/static/",
 			},
 		}
 	})
