@@ -33,5 +33,5 @@ func (r *Routes) Api() {
 	// Upload
 	uploadRoute := app.Group("upload")
 	uploadRoute.Post("/", middlewares.UploadMiddleware(config.GetConfig().Upload.Path))
-	uploadRoute.Put("/", middlewares.UpdateUploadMiddleware(config.GetConfig().Upload.Path))
+	uploadRoute.Put("/:filename", middlewares.UpdateUploadMiddleware(config.GetConfig().Upload.Path))
 }

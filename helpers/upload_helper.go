@@ -14,7 +14,7 @@ type UploadResponse struct {
 	Location string `json:"location"`
 }
 
-func UploadFile(file *multipart.FileHeader, uploadPath string, replaced *string) (location string, err error) {
+func UploadFile(file *multipart.FileHeader, uploadPath string, fileName *string) (location string, err error) {
 	src, err := file.Open()
 	if err != nil {
 		return
@@ -27,7 +27,7 @@ func UploadFile(file *multipart.FileHeader, uploadPath string, replaced *string)
 	}
 
 	// Check for directory
-	if _, err := os.Stat(uploadPath); os.IsNotExist(err) && replaced == nil {
+	if _, err := os.Stat(uploadPath); os.IsNotExist(err) && fileName == nil {
 		if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
 			return "", err
 		}
@@ -36,8 +36,10 @@ func UploadFile(file *multipart.FileHeader, uploadPath string, replaced *string)
 	}
 
 	var name string = uploadPath + uuid.New().String() + filepath.Ext(file.Filename)
-	if replaced != nil {
-		name = *replaced
+
+	// if fileName is not nil that indicate this is update method
+	if fileName != nil {
+		name = uploadPath + *fileName
 	}
 
 	err = os.WriteFile(name, content, 0644)

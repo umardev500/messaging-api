@@ -18,8 +18,11 @@ func UpdateUploadMiddleware(uploadPath string) fiber.Handler {
 			Ticket: ticket,
 		}
 
-		var fileloc = c.FormValue("filepath")
-		if _, err := os.Stat(fileloc); os.IsNotExist(err) {
+		var dir = config.GetConfig().Upload.Path
+		var filename = c.Params("filename")
+		var fileLocation = dir + filename
+
+		if info, err := os.Stat(fileLocation); os.IsNotExist(err) || info.IsDir() {
 			resp.Message = fiber.ErrNotFound.Message
 			return c.Status(fiber.ErrNotFound.Code).JSON(resp)
 		}
@@ -32,9 +35,7 @@ func UpdateUploadMiddleware(uploadPath string) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(resp)
 		}
 
-		var dir = config.GetConfig().Upload.Path
-
-		location, err := helpers.UploadFile(fileHeader, dir, &fileloc)
+		location, err := helpers.UploadFile(fileHeader, dir, &filename)
 		if err != nil {
 			log.Err(err).Msgf("error uploading file to server | err : %v", err)
 			return err
