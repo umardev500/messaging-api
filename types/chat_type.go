@@ -22,7 +22,6 @@ var Rooms = make(map[string]map[string]*Client)
 type Broadcast struct {
 	Sender  string
 	Room    string
-	Clients map[string]*Client
 	Message string
 }
 

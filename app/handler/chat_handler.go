@@ -145,11 +145,13 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 
 		// Listen for message
 		for {
-			_, _, err := c.Conn.ReadMessage()
+			_, msg, err := c.Conn.ReadMessage()
 			if err != nil {
 				log.Error().Err(err).Msg("error reading message")
 				return
 			}
+
+			fmt.Println(msg)
 		}
 	})
 }
