@@ -31,7 +31,7 @@ type Broadcast struct {
 	Sender   string  `json:"-"`
 	Username string  `json:"username,omitempty"`
 	Room     string  `json:"room"`
-	Message  string  `json:"message"`
+	Message  string  `json:"message,omitempty"`
 }
 
 type BroadcastChatList struct {
