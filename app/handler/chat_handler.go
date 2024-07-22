@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/domain"
+	"github.com/umardev500/messaging-api/helpers"
 	"github.com/umardev500/messaging-api/types"
 	"github.com/umardev500/messaging-api/utils"
 )
@@ -145,13 +146,21 @@ func (ch *chatHandler) WsChat() fiber.Handler {
 
 		// Listen for message
 		for {
-			_, msg, err := c.Conn.ReadMessage()
+			var signalMsg types.ChatSignal
+			err := c.Conn.ReadJSON(&signalMsg)
 			if err != nil {
 				log.Error().Err(err).Msg("error reading message")
 				return
 			}
 
-			fmt.Println(msg)
+			// @Todo Broadcast signal message
+			var signalData = types.Broadcast{
+				Type:     signalMsg.Type,
+				Room:     room,
+				Sender:   userId,
+				Username: signalMsg.Username,
+			}
+			helpers.BroadcastChat(signalData, nil)
 		}
 	})
 }

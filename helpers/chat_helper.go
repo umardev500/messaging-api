@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/fasthttp/websocket"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/messaging-api/storage"
@@ -32,7 +31,7 @@ func BroadcastChat(msg types.Broadcast, wg *sync.WaitGroup) {
 				// This will happend if antoher user is online
 				// Otherwhise this block code will proccessing
 				// Because we have not live users to chat
-				if err := cl.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Message)); err != nil {
+				if err := cl.Conn.WriteJSON(msg); err != nil {
 					log.Error().Msgf("failed to write message %v", err)
 					// Handle error: remove client from the room
 					delete(types.Onlines, clientId)

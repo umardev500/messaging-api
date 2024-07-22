@@ -82,6 +82,7 @@ func (m *messageService) CreateMessage(ctx context.Context, payload types.Create
 
 	// Do broadcasting message
 	var broadcastData = types.Broadcast{
+		Type:    types.MsgTypeChat,
 		Sender:  userId,
 		Room:    payload.ChatId,
 		Message: payload.Content,

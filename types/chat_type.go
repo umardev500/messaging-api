@@ -19,10 +19,19 @@ type Online struct {
 var Onlines = make(map[string]*Online)
 var Rooms = make(map[string]map[string]*Client)
 
+type MsgType string
+
+var (
+	MsgTypeTyping MsgType = "typing"
+	MsgTypeChat   MsgType = "chat"
+)
+
 type Broadcast struct {
-	Sender  string
-	Room    string
-	Message string
+	Type     MsgType `json:"type"`
+	Sender   string  `json:"-"`
+	Username string  `json:"username,omitempty"`
+	Room     string  `json:"room"`
+	Message  string  `json:"message"`
 }
 
 type BroadcastChatList struct {
@@ -65,4 +74,10 @@ type ChatList struct {
 	ChatName    string    `json:"chat_name"`
 	Content     string    `json:"content"`
 	LastMsgDate time.Time `json:"last_msg_date"`
+}
+
+// Signal
+type ChatSignal struct {
+	Type     MsgType `json:"type"`
+	Username string  `json:"username"`
 }
